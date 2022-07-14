@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ERROR</title>
+    <link src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"
+          th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js}" >
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          th:href="@{https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css}" >
+</head>
+<body>
+
+    <main class="container " style="display: block; text-align: center;" th:style="'display: block; text-align: center'">
+        <h1 th:text="'Щось пішло не так !!!'" style="color: red"></h1>
+        <a class="button" th:href="@{~/start-page}" >Повернутись на головну сторінку.</a>
+</main>
+
+</body>
+</html>

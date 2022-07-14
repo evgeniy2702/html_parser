@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML_PARSER</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+            th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js}"></script>
+    <link src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"
+          th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js}" >
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          th:href="@{https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css}" >
+    <link rel="stylesheet" type="text/css" th:href="@{/main.css}" href="/static/css/main.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/main.css}" href="/static/css/logo.css">
+</head>
+<body>
+<!-- HEADER WITH FILTER-->
+<div class="container text-left">
+    <img class="logo" src="https://peredplata.ukrposhta.ua/image/catalog/asset2.png"
+         th:src="@{https://peredplata.ukrposhta.ua/image/catalog/asset2.png}" alt="logo" th:alt="'logo'">
+    <h4 class="text-center" th:class="'text-center'" style="color: brown;" th:style="'color: brown'">
+        HTML parser для внутрішніх завдань УКРПОШТА
+        <span th:text="${#temporals.format(date, 'dd-MM-yyyy')}" style="color: darkblue;" th:style="'color : darkblue'"> 26.07.2021</span>
+        <span style="color: darkblue;" th:style="'color : darkblue'">р.</span>
+    </h4>
+    <div>
+        <div class="nav-body" th:class="'nav-body'"> <!--card-body-->
+            <nav >
+                <ul >
+
+                    <!-- Окно ввода адреса страницы для парсинга и запуска/останова процесса -->
+                    <li class="list-group-item border-0" th:class="'list-group-item border-0'">
+                        <form id="url" th:id="'url'">
+                            <label for="input-url" th:for="'input-url'" >Введіть URL адресу сторінки : </label>
+                            <input id="input-url" th:id="'input-url'" name="url" th:name="'url'" type="text" th:type="'text'" placeholder="https://google.com"
+                                   th:placeholder="'https://google.com'" autocomplete="off" th:autocomplete="'off'"/>
+                            <input class="btn btn-info btn-sm mb-2" th:class="'btn btn-info btn-sm mb-2'" type="submit" th:type="'submit'"
+                                   form="url" th:form="url" value="PARSE" th:value="'PARSE'" />
+                            <input class="btn btn-danger btn-sm mb-2" th:class="'btn btn-danger btn-sm mb-2'" type="submit" th:type="'submit'"
+                                   form="url" th:form="'url'" value="STOP PARSE" th:value="'STOP PARSE'" />
+                        </form>
+                    </li>
+
+                    <!-- Окно информативное для показания статусов процесса и отсчета времени или колличества проходов -->
+                    <li class="list-group-item border-0" th:class="'list-group-item border-0'">
+                        <span th:text="${status}">STATUS</span>
+                        <span>Real Time</span> - <span>Real Time</span>
+                    </li>
+
+                    <!-- Окно для вывода логов со стороны бэкэнда -->
+                    <li class="list-group-item border-0"  th:class="'list-group-item border-0'">
+                        <!-- Триггер / Открыть Модальный -->
+                        <a id="btnConsole" th:id="'btnConsole'" href="#modalConsole" th:href="@{#modalConsole}">Показати Console logs</a>
+                        <!-- Модальноe окно -->
+                        <div id="modalConsole" th:id="'modalConsole'" class="modalConsole" th:class="'modalConsole'">
+                            <div class="console mr-4 border border-dark" th:class="'console mr-4 border border-dark'">
+                                <span class="close my-1 mx-1" th:class="'close my-1 mx-1'">&times;</span>
+                                <textarea id="txtid" th:id="'txtid'" class="my-2 ml-2 mr-0 py-0 px-0" th:class="'my-2 ml-2 mr-0 py-0 px-0'"
+                                          name="txtname" th:name="'txtname'" rows="4" th:rows="'4'" cols="50" th:cols="'50'" maxlength="200" th:maxlength="'200'">
+                                    </textarea>
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- Окно для задания параметров в результирующий джейсон для передачи в сторону бэкэенда -->
+                    <li class="list-group-item border-0"  th:class="'list-group-item border-0'">
+                        <!-- Триггер / Открыть Модальный -->
+                        <a id="btnParser" th:id="'btnParser'" href="#modalParser" th:href="@{#modalParser}">Параметри парсингу</a>
+                        <!-- Модальноe окно -->
+                        <div id="modalParser" th:id="'modalParser'" class="modalConsole  mt-2" th:class="'modalConsole  mt-2'">
+                            <div class="console mr-4 border border-dark text-left pl-2" th:class="'console mr-4 border border-dark text-left pl-2'">
+                                <span class="close my-1 mx-1" th:class="'close my-1 mx-1'">&times;</span>
+                                <label  for="operation-mode" th:for="'operation-mode'">Режим роботи парсеру : </label>
+                                <!-- Модальноe окно -->
+                                <div id="modal-operation-work" th:id="'modal-operation-work'" class="modal text-center" th:class="'modal card-header text-center'">
+
+                                </div>
+                                <label for="timeout" th:for="'timeout'" >Затримка між проходами по сторінці :
+                                    <input id="timeout" th:id="'timeout'" name="parse_timeout" th:name="'parse_timeout'" type="number" th:type="'number'"
+                                           placeholder="20000" th:placeholder="'20000'" onkeyup="isChangeTimeoutError()"/>
+                                    <span id="label-timeout-span" th:id="'label-timeout-span'" class="ml-2" th:class="'ml-2'"></span> мсек
+                                </label>
+                                <label for="average_timeout" th:for="'average_timeout'" >Середній час між затримками :
+                                    <input id="average_timeout" th:id="'average_timeout'" name="parse_delta" th:name="'parse_delta'" type="number"
+                                           th:type="'number'" placeholder="20000" th:placeholder="'20000'" onkeyup="isChangeAverageTimeoutError()"/>
+                                    <span id="label-average_timeout-span" th:id="'label-average_timeout-span'" class="ml-2" th:class="'ml-2'"></span> мсек
+                                </label>
+                                <label for="threads_count" th:for="'threads_count'" >Кількість потоків :
+                                    <input id="threads_count" th:id="'threads_count'" name="parse_delta" th:name="'parse_delta'" type="number"
+                                           th:type="'number'" placeholder="1" th:placeholder="'2'" onkeyup="isChangeThreads_countError()"/>
+                                    <span id="label-threads_count-span" th:id="'label-threads_count-span'" class="ml-2" th:class="'ml-2'"></span>
+                                </label>
+                                <label id="selectors" th:id="'selectors'" for="selectors" th:for="'selectors'" >Конструктор селектора для парсингу : <i style = "color : red;">поки що знаходиться в стадії розробки</i>
+                                    <div class="selectors-div mx-4" th:class="'selectors-div mx-4'">
+                                        <label id="label-selectors-label-first" th:id="'label-selectors-label-first'" >всю сторінку : </label>
+                                        <input id="all_page" th:id="'all_page'" name="all_page" th:name="'all_page'" type="checkbox" th:type="'checkbox'" />
+                                        <label id="label-selectors-label-second" th:id="'label-selectors-label-second'" >по тегах : </label>
+                                        <input id="tag" th:id="'tag'" name="tag" th:name="'tag'" type="checkbox" th:type="'checkbox'" />
+                                        <!-- Модальноe окно -->
+                                        <div id="modal-tag" th:id="'modal-tag'" class="modal card-header text-center" th:class="'modal card-header text-center'">
+                                        </div>
+                                        <!-- Модальноe окно -->
+                                        <div id="modal-tag-constructor" th:id="'modal-tag-constructor'" class="modal card-header text-center"
+                                             th:class="'modal card-header text-center'">
+                                        </div>
+                                        <label id="label-selectors-label-third" th:id="'label-selectors-label-third'    " >по атрибуту class : </label>
+                                        <input id="class" th:id="'class'" name="class" th:name="'class'" type="checkbox" th:type="'checkbox'" />
+                                        <!-- Модальноe окно -->
+                                        <div id="modal-class" th:id="'modal-class'" class="modal card-header text-center" th:class="'modal card-header text-center'">
+                                        </div>
+                                        <label id="label-selectors-label-forth" th:id="'label-selectors-label-forth'" >по атрибуту id : </label>
+                                        <input id="id" th:id="'id'" name="id" th:name="'id'" type="checkbox" th:type="'checkbox'" />
+                                        <!-- Модальноe окно -->
+                                        <div id="modal-id" th:id="'modal-id'" class="modal card-header text-center" th:class="'modal card-header text-center'">
+                                        </div>
+                                        <label id="label-selectors-label-fifth" th:id="'label-selectors-label-fifth'" >регулярні вирази : </label>
+                                        <input id="regex" th:id="'regex'" name="regex" th:name="'regex'" type="checkbox" th:type="'checkbox'" />
+                                        <!-- Модальноe окно -->
+                                        <div id="modal-regex" th:id="'modal-regex'" class="modal card-header text-center" th:class="'modal card-header text-center'">
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- Окно для вывода результирующего тела джейсона -->
+                    <li class="list-group-item border-0"  th:class="'list-group-item border-0'">
+                        <!-- Триггер / Открыть Модальный -->
+                        <a id="btnJson" th:id="'btnJson'" href="#modalJson" th:href="@{#modalJson}">Тіло запиту</a>
+                        <!-- Модальноe окно -->
+                        <div id="modalJson" th:id="'modalJson'" class="modalConsole  mt-2" th:class="'modalConsole  mt-2'">
+                            <div class="console mr-4 border border-dark" th:class="'console mr-4 border border-dark'">
+                                <span class="close my-1 mx-1" th:class="'close my-1 mx-1'">&times;</span>
+                                <span class="close my-1 mx-1" th:class="'close my-1 mx-1'">Очистити</span>
+                                <textarea id="txtJson" th:id="'txtJson'" class="my-2 ml-2 mr-0 py-0 px-0 " th:class="'my-2 ml-2 mr-0 py-0 px-0'"
+                                          name="txtJsonName" th:name="'txtJsonName'" rows="4" th:rows="'4'" cols="50" th:cols="'50'" maxlength="200" th:maxlength="'200'"></textarea>
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- Ввод endpoint значения в ручном режиме -->
+                    <!--<li class="list-group-item border-0"  th:class="'list-group-item border-0'">-->
+                    <!--&lt;!&ndash; Триггер / Открыть Модальный &ndash;&gt;-->
+                    <!--<a id="btnUrl" th:id="'btnUrl'" href="#modalUrl" th:href="@{#modalUrl}">EndPoints</a>-->
+                    <!--&lt;!&ndash; Модальноe окно &ndash;&gt;-->
+                    <!--<div id="modalUrl" th:id="'modalUrl'" class="modalConsole  mt-2" th:class="'modalConsole  mt-2'">-->
+                    <!--<div class="console mr-4 py-2 px-4 border border-dark" th:class="'console mr-4 py-2 px-4 border border-dark'"-->
+                    <!--style="display: grid" th:style="'display:grid'">-->
+                    <!--<span class="close my-1 mx-1" th:class="'close my-1 mx-1'">&times;</span>-->
+
+                    <!--<label for="ddos_ep" th:for="'ddos_ep'" >Введіть EndPoint Ddos : </label>-->
+                    <!--<input id="ddos_ep" th:id="'ddos_ep'" name="ddos_ep" th:name="'ddos_ep'" type="text" th:type="'text'"-->
+                    <!--autocomplete="off" th:autocomplete="'off'"/>-->
+
+                    <!--<label for="page_info_ep" th:for="'page_info_ep'" >Введіть EndPOint Info : </label>-->
+                    <!--<input id="page_info_ep" th:id="'page_info_ep'" name="page_info_ep" th:name="'page_info_ep'" type="text" th:type="'text'"-->
+                    <!--autocomplete="off" th:autocomplete="'off'"/>-->
+
+                    <!--<label for="log_ep" th:for="'log_ep'" >Введіть EndPOint Log : </label>-->
+                    <!--<input id="log_ep" th:id="'log_ep'" name="log_ep" th:name="'log_ep'" type="text" th:type="'text'"-->
+                    <!--autocomplete="off" th:autocomplete="'off'"/>-->
+
+                    <!--<label for="stop_parse_ep" th:for="'stop_parse_ep'" >Введіть EndPOint StopParser : </label>-->
+                    <!--<input id="stop_parse_ep" th:id="'stop_parse_ep'" name="stop_parse_ep" th:name="'stop_parse_ep'" type="text" th:type="'text'"-->
+                    <!--autocomplete="off" th:autocomplete="'off'"/>-->
+                    <!--</div>-->
+                    <!--</div>-->
+
+                    <!--</li>-->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<script th:inline = "javascript">
+    let tags = [[${tags_list}]];
+    let status = [[${status}]];
+    let ddos_ep = [[${ddos_ep}]];
+    let page_info_ep = [[${page_info_ep}]];
+    let log_ep = [[${log_ep}]];
+    let stop_parse_ep = [[${stop_parse_ep}]];
+</script>
+<script th:src="@{start_work.js}" src = "/static/js/start_work.js"></script>
+<script th:src="@{response_json.js}" src="/static/js/response_json.js"></script>
+<script th:src="@{ul_li_click.js}" src="/static/js/ul_li_click.js"></script>
+<script th:src="@{select_operation_work.js}" src="/static/js/select_operation_work.js"></script>
+<script th:src="@{all_page_choice.js}" src="/static/js/all_page_choice.js"></script>
+<script th:src="@{tags_choice.js}" src="/static/js/tags_choice.js"></script>
+<script th:src="@{class_choice.js}" src="/static/js/class_choice.js"></script>
+<script th:src="@{id_choice.js}" src="/static/js/id_choice.js"></script>
+<script th:src="@{regex_choice.js}" src="/static/js/regex_choice.js"></script>
+<script th:src="@{timeout_threads_count_average_timeout.js}" src="/static/js/timeout_threads_count_average_timeout.js"></script>
+<script th:src="@{input_url.js}" src="/static/js/input_url.js"></script>
+<script th:src="@{parse_post_method.js}" src="/static/js/parse_post_method.js"></script>
+<script th:src="@{stop_parser.js}" src="/static/js/stop_parser.js"></script>
+<script th:src="@{endpoints_input.js}" src="/static/js/endpoints_input.js"></script>
+</body>
+</html>
